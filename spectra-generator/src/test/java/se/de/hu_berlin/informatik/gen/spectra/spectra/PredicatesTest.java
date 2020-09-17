@@ -3,6 +3,7 @@ package se.de.hu_berlin.informatik.gen.spectra.spectra;
 import org.junit.Test;
 import se.de.hu_berlin.informatik.gen.spectra.main.PredicatesSpectraGenerator;
 import se.de.hu_berlin.informatik.gen.spectra.predicates.mining.Miner;
+import se.de.hu_berlin.informatik.gen.spectra.predicates.modules.Output;
 import se.de.hu_berlin.informatik.utils.files.FileUtils;
 import se.de.hu_berlin.informatik.utils.miscellaneous.Misc;
 import se.de.hu_berlin.informatik.utils.miscellaneous.TestSettings;
@@ -35,6 +36,7 @@ public class PredicatesTest extends TestSettings {
         FileUtils.delete(profilesFile);
         long startTime = new Date().getTime();
         new PredicatesSpectraGenerator.Builder()
+                .setJoinStrategy(Output.JOINSTRATEGY.PAIRS.toString())
                 .setProjectDir(project.getProjectMainDir())
                 .setSourceDir(project.getSrcDir())
                 .setTestClassDir(project.getBinTestDir())
@@ -58,7 +60,6 @@ public class PredicatesTest extends TestSettings {
 
         if (successful) {
             assertTrue(Files.exists(profilesFile));
-            //checkTraceSpectra(spectraZipFile);
         } else {
             assertFalse(Files.exists(profilesFile));
         }

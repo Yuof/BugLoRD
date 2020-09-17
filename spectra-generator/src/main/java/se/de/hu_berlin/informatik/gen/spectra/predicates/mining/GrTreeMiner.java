@@ -100,9 +100,9 @@ public class GrTreeMiner {
 
     private double InformationGain(int p, int n, int db_pos, int db_neg){
         double d = db_pos + db_neg;
-        double first = Entropy(db_pos,db_neg);
+        double first = Entropy(db_pos, db_neg);
         double second = ((p+n)/d) * Entropy(p,n);
-        double third = ((d-p+n)/d) * Entropy(db_pos-p,db_neg-n);
+        double third = ((d - (p + n)) / d) * Entropy(db_pos-p,db_neg-n);
         return first - second - third;
     }
 
@@ -110,7 +110,7 @@ public class GrTreeMiner {
         double total = a + b;
         double first = a/total == 0 ? 0 : -(a/total) * log(a/total);
         double second = b/total == 0 ? 0 : -(b/total) * log(b/total);
-        return (first+second)/log(2);
+        return (first+second) / log(2);
     }
 
 }

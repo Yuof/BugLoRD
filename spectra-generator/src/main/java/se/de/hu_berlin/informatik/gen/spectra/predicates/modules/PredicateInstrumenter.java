@@ -22,8 +22,11 @@ import java.util.Objects;
 
 final public class PredicateInstrumenter  extends AbstractInstrumenter {
 
-    public PredicateInstrumenter(Path projectDir, String instrumentedDir, String testClassPath, String... pathsToBinaries) {
+    private final String joinStrategy;
+
+    public PredicateInstrumenter(Path projectDir, String instrumentedDir, String testClassPath, String joinstrategy, String... pathsToBinaries) {
         super(projectDir, instrumentedDir, testClassPath, pathsToBinaries);
+        joinStrategy = joinstrategy;
     }
 
     @Override
@@ -39,6 +42,10 @@ final public class PredicateInstrumenter  extends AbstractInstrumenter {
         if (pathsToBinaries != null) {
             instrArgs = Misc.addToArrayAndReturnResult(instrArgs, PredicateInstrumenter.Instrument.CmdOptions.INSTRUMENT_CLASSES.asArg());
             instrArgs = Misc.joinArrays(instrArgs, pathsToBinaries);
+        }
+
+        if (this.joinStrategy != null) {
+            instrArgs = Misc.addToArrayAndReturnResult(instrArgs, Instrument.CmdOptions.JOINSTRATEGY.asArg(), this.joinStrategy);
         }
 
         String systemClassPath = new ClassPathParser().parseSystemClasspath().getClasspath();
@@ -68,7 +75,8 @@ final public class PredicateInstrumenter  extends AbstractInstrumenter {
                     + "Will be appended to the regular class path if this option is set.", false),
             INSTRUMENT_CLASSES(Option.builder("c").longOpt("classes").required()
                     .hasArgs().desc("A list of classes/directories to instrument.").build()),
-            OUTPUT("o", "output", true, "Path to output directory.", true);
+            OUTPUT("o", "output", true, "Path to output directory.", true),
+            JOINSTRATEGY("j", "joinStrategy", true, "Strategy used to construct joint Predicates.", false);
 
             /* the following code blocks should not need to be changed */
             final private OptionWrapper option;
@@ -129,6 +137,9 @@ final public class PredicateInstrumenter  extends AbstractInstrumenter {
             for (String file : classesToInstrument) {
                 source.add(new File(file).getAbsoluteFile());
             }
+
+            if (options.getOptionValue(CmdOptions.JOINSTRATEGY) != null)
+                Output.joinStrategy = Output.JOINSTRATEGY.valueOf(options.getOptionValue(CmdOptions.JOINSTRATEGY));
 
             final File absoluteDest = instrumentedDir.toFile().getAbsoluteFile();
             int total = 0;

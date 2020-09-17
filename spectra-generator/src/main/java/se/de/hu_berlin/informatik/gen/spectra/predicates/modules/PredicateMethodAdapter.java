@@ -20,6 +20,7 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
     private final ArrayList<Label> myLabel = new ArrayList<>();
     private final HashMap<Integer, String> variableNames = new HashMap<>();
     private final String fileName;
+    private final String OutputClass = Type.getInternalName(Output.class); // "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output";
     public GeneratorAdapter ga;
     public AnalyzerAdapter aa;
     private int currentLine;
@@ -58,7 +59,7 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
                 CreateComparePredicates(var, DOUBLE);
                 break;
             case ASTORE:
-                //CreateNullPredicates(var);
+                CreateNullPredicates(var);
         }
     }
 
@@ -77,7 +78,7 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
 
         ga.visitLabel(label2);
         ga.push(truePredicate.id);
-        mv.visitMethodInsn(INVOKESTATIC, "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output", "triggerPredicate", "(I)V", false);
+        mv.visitMethodInsn(INVOKESTATIC, OutputClass, "triggerPredicate", "(I)V", false);
         ga.visitJumpInsn(GOTO, label1);
 
         ga.visitLabel(label1);
@@ -94,12 +95,12 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
 
         ga.visitLabel(label2);
         ga.push(truePredicate.id);
-        mv.visitMethodInsn(INVOKESTATIC, "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output", "triggerPredicate", "(I)V", false);
+        mv.visitMethodInsn(INVOKESTATIC, OutputClass, "triggerPredicate", "(I)V", false);
         ga.visitJumpInsn(GOTO, label3);
 
         ga.visitLabel(label1);
         ga.push(falsePredicate.id);
-        mv.visitMethodInsn(INVOKESTATIC, "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output", "triggerPredicate", "(I)V", false);
+        mv.visitMethodInsn(INVOKESTATIC, OutputClass, "triggerPredicate", "(I)V", false);
 
         ga.visitLabel(label3);
     }
@@ -196,7 +197,7 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
 //            Label label2 = new Label();
 //            mv.visitLabel(label2);
             ga.push(predicate.id);
-            mv.visitMethodInsn(INVOKESTATIC, "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output", "triggerPredicate", "(I)V", false);
+            mv.visitMethodInsn(INVOKESTATIC, OutputClass, "triggerPredicate", "(I)V", false);
             //ga.goTo(label1);
             mv.visitLabel(label1);
         });
@@ -257,7 +258,7 @@ class PredicateMethodAdapter extends MethodVisitor implements Opcodes {
 
         mv.visitLabel(label2);
         ga.push(id);
-        ga.visitMethodInsn(INVOKESTATIC, "se/de/hu_berlin/informatik/gen/spectra/predicates/modules/Output", "triggerPredicate", "(I)V", false);
+        ga.visitMethodInsn(INVOKESTATIC, OutputClass, "triggerPredicate", "(I)V", false);
 
         mv.visitLabel(label1);
     }

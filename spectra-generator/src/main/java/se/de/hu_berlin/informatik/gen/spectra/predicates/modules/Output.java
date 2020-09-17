@@ -9,16 +9,33 @@ public class Output {
     public static Map<Integer, Predicate> Predicates = new HashMap<>();
     public static Map<Integer, Integer> Triggers = new HashMap<>();
     public static int nextPredicateNumber;
+
+    public static JOINSTRATEGY joinStrategy;
+    private static Integer lastPredicateId;
+
     public Output()
     {
+    }
+
+    public enum JOINSTRATEGY {
+        PAIRS,TRIPLES
     }
 
     public static void addPredicate(Predicate newPredicate){
         Predicates.put(newPredicate.id,newPredicate);
     }
 
+    //trigger Predicate
     public static void triggerPredicate(int id){
         Triggers.put(id, Triggers.getOrDefault(id, 0) + 1);
+        lastPredicateId = id;
+    }
+
+    //trigger PairPredicate
+    public static void triggerPredicate(int id, int lastId){
+        if (lastPredicateId == lastId) {
+            Triggers.put(id, Triggers.getOrDefault(id, 0) + 1);
+        }
     }
 
     public static void outputPredicates(){
@@ -32,6 +49,7 @@ public class Output {
     }
 
     public static void writeToFile(File outputDir) throws IOException {
+        System.out.println("JoinStrategy is set to: " + joinStrategy);
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputDir.getParent() + "/Predicates.db"));
         oos.writeObject(Predicates);
         oos.flush();

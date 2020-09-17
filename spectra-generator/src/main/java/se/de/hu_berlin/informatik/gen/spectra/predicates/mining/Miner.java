@@ -3,11 +3,9 @@ package se.de.hu_berlin.informatik.gen.spectra.predicates.mining;
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.tuple.Pair;
 import se.de.hu_berlin.informatik.gen.spectra.predicates.extras.Profile;
+import se.de.hu_berlin.informatik.utils.miscellaneous.Log;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -18,6 +16,15 @@ public class Miner {
         String folder = args[0];
         String row;
         Database db = new Database();
+
+        //reset file
+        try {
+            new FileOutputStream(Paths.get(folder, "Signatures.csv").toFile()).close();
+        }
+        catch (IOException ex) {
+            Log.abort(Miner.class,"could not reset Signatures.csv");
+        }
+
         try {
             BufferedReader csvReader = new BufferedReader(new FileReader(Paths.get(folder, "Profiles.csv").toString()));
             while ((row = csvReader.readLine()) != null) {
@@ -42,14 +49,14 @@ public class Miner {
 //        Profile t5 = new Profile(Arrays.asList(4,7,9,11,16), false);
 //        Database db = new Database(new ArrayList<Profile>(Arrays.asList(t1, t2, t3, t4, t5)),new ArrayList<>());
 
-
+        //int neg_support = db.getNegativeCount() / 2.0 ;
         db.PurgeFullSupport();
 
         GrTreeMiner miner = new GrTreeMiner();
-        HashMap<Pair<Integer, Integer>, HashSet<GrTree.Item>> test = miner.MineSignatures(db,10,1,2);
+        HashMap<Pair<Integer, Integer>, HashSet<GrTree.Item>> signatures = miner.MineSignatures(db,10,1,2);
 
 
-        List<Map.Entry<Pair<Integer, Integer>, HashSet<GrTree.Item>>> sorted = new ArrayList<>(test.entrySet());
+        List<Map.Entry<Pair<Integer, Integer>, HashSet<GrTree.Item>>> sorted = new ArrayList<>(signatures.entrySet());
         sorted.sort(Comparator.comparingDouble(entry -> miner.DiscriminativeSignificance(entry.getKey().getLeft(), entry.getKey().getRight(), db.getPositiveCount(), db.getNegativeCount())));
         Collections.reverse(sorted);
 
@@ -70,8 +77,9 @@ public class Miner {
 
     static void writeSignatures(String line, String fileString) {
         try {
-            FileWriter fw = new FileWriter(Paths.get(fileString, "Profiles.csv").toString(),true);
+            FileWriter fw = new FileWriter(Paths.get(fileString, "Signatures.csv").toString(),true);
             fw.append(line);
+            fw.append(System.lineSeparator());
             fw.flush();
             fw.close();
         }
